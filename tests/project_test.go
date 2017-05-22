@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	_ "app-service/algorithm-service/routers"
+	_ "app-service/bussiness-service/routers"
 	"model"
 )
 
