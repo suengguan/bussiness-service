@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"config"
 	"model"
 	"utility/fileoperator"
 	"utility/httpclient"
@@ -119,7 +118,8 @@ func (this *JobService) createWorkspace(user *model.User, job *model.Job) error 
 		for _, pod := range module.Pods {
 			var podPath string
 
-			podPath = config.WORKSPACE_PATH
+			var cfg = beego.AppConfig
+			podPath = cfg.String("workspace")
 			// pod path
 			podPath += "/" + user.Name
 			podPath += "/" + job.Project.Name + "-" + strconv.FormatInt(job.Project.Id, 36)
@@ -224,8 +224,10 @@ func (this *JobService) runPod(user *model.User, pod *model.Pod, module *model.M
 	namespace := user.Name
 	label := pod.RcName
 	name := pod.SvcName
-	containerPort := config.CONTAINER_PORT
-	image := config.ALGORITHM_ENV_IMAGE
+	// todo config
+	//image := config.ALGORITHM_ENV_IMAGE
+	containerPort := 8080
+	image := "192.168.0.21:5000/system/algorithm-env:v4"
 	limitCpu := strconv.FormatFloat(pod.Cpu, 'f', 3, 32)
 	limitMemory := strconv.FormatFloat(pod.Memory*1024.0, 'f', 0, 32) + "Mi"
 	envDescriptionStr := module.Description
@@ -276,7 +278,9 @@ func (this *JobService) runPod(user *model.User, pod *model.Pod, module *model.M
 	var h3 ResourceModel.ContainerHostVolume
 	h3.Name = "algorithm"
 	h3.ContainerPath = "/algorithm"
-	h3.HostPath = config.ALGORITHM_PATH + "/" + module.Algorithm
+	// todo
+	//h3.HostPath = config.ALGORITHM_PATH + "/" + module.Algorithm
+	h3.HostPath = "/pme2017/algorithm" + "/" + module.Algorithm
 	h3.ReadOnly = true
 	hostPathList = append(hostPathList, &h3)
 	beego.Debug("->  " + h3.Name + " = " + h3.HostPath + ":" + h3.ContainerPath)
@@ -364,7 +368,16 @@ func (this *JobService) runPod(user *model.User, pod *model.Pod, module *model.M
 	data.Job = module.Job
 
 	var ip string
-	if config.DEBUG_ONLY {
+	var cfg = beego.AppConfig
+	// todo
+	// if config.DEBUG_ONLY {
+	// 	ip = "http://192.168.0.206"
+	// } else {
+	// 	// label + namespace
+	// 	ip = "http://" + name + "." + user.Name
+	// }
+
+	if cfg.String("runmode") == "dev" {
 		ip = "http://192.168.0.206"
 	} else {
 		// label + namespace
