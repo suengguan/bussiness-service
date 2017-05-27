@@ -34,7 +34,7 @@ func (this *ProjectService) Create(project *model.Project) (*model.Project, erro
 	projectPath := cfg.String("workspace") + "/" + user.Name + "/" + newProject.Name
 	err = os.MkdirAll(projectPath, os.ModePerm) //生成多级目录
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	beego.Debug("result:", *newProject)
