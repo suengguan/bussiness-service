@@ -148,6 +148,9 @@ func (this *JobService) createWorkspace(user *model.User, job *model.Job) error 
 			}
 			fileoperator.Write(statusfn, string(statusBody))
 			beego.Debug("status file:", statusfn)
+			var statusContent string
+			statusContent, err = fileoperator.Read(statusfn)
+			beego.Debug("status content:", statusContent)
 		}
 	}
 

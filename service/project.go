@@ -2,6 +2,7 @@ package service
 
 import (
 	"model"
+	"os"
 
 	daoApi "api/dao_service"
 
@@ -15,6 +16,13 @@ func (this *ProjectService) Create(project *model.Project) (*model.Project, erro
 	var err error
 	var newProject *model.Project
 
+	beego.Debug("->get user")
+	var user *model.User
+	user, err = daoApi.UserDaoApi.GetById(project.User.Id)
+	if err != nil {
+		return nil, err
+	}
+
 	beego.Debug("->create project")
 	newProject, err = daoApi.BussinessDaoApi.CreateProject(project)
 	if err != nil {
@@ -22,6 +30,12 @@ func (this *ProjectService) Create(project *model.Project) (*model.Project, erro
 	}
 
 	// create project dir
+	var cfg = beego.AppConfig
+	projectPath := cfg.String("workspace") + "/" + user.Name + "/" + newProject.Name
+	err = os.MkdirAll(projectPath, os.ModePerm) //生成多级目录
+	if err != nil {
+		return err
+	}
 
 	beego.Debug("result:", *newProject)
 
