@@ -3,6 +3,7 @@ package service
 import (
 	"model"
 	"os"
+	"strconv"
 
 	daoApi "api/dao_service"
 
@@ -31,7 +32,7 @@ func (this *ProjectService) Create(project *model.Project) (*model.Project, erro
 
 	// create project dir
 	var cfg = beego.AppConfig
-	projectPath := cfg.String("workspace") + "/" + user.Name + "/" + newProject.Name
+	projectPath := cfg.String("workspace") + "/" + user.Name + "/" + newProject.Name + "-" + strconv.FormatInt(newProject.Id, 36)
 	err = os.MkdirAll(projectPath, os.ModePerm) //生成多级目录
 	if err != nil {
 		return nil, err
